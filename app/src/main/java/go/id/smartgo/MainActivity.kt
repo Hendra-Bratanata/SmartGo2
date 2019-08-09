@@ -3,6 +3,7 @@ package go.id.smartgo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
 import go.id.smartgo.ApiRepository.ApiReposirtory
 import go.id.smartgo.ApiRepository.PromoApi
 import kotlinx.android.synthetic.main.activity_main.*
@@ -10,43 +11,82 @@ import kotlinx.coroutines.delay
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),MainView {
+    override fun showData(listMap: List<Relay>) {
+         val R = listMap[0]
+
+        if(R.R1!!.equals("OFF")){
+            btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_blue)
+            state = true
+        }
+        else if(R.R1!!.equals("ON")){
+            btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_open_blue)
+            state = false
+        }
+
+
+    }
+
+    override fun showDataMap(listMap: List<MAPS>) {
+
+    }
+
     lateinit var apiReposirtory: ApiReposirtory
+    lateinit var gson: Gson
+    lateinit var presenter: Presenter
+    lateinit var listData: MutableList<Relay>
+    var state = true
+
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         apiReposirtory = ApiReposirtory()
+        gson = Gson()
+        listData = mutableListOf()
+        presenter = Presenter(this,gson,apiReposirtory)
 
+        presenter.getData()
+
+
+        //saat tombol remot ditekan icon akan menjadi abu2 selama 3 detik kemudian kembali lagi menanjadi biru
+        // data R2 pada database di set menjadi ON
+        // dan remote tidak bisa diklik selama 3 detik
         btnRemote.setOnClickListener {
             btnRemote.background = ContextCompat.getDrawable(this,R.drawable.ic_settings_remote_gray)
+            btnRemote.isClickable = false
            Thread(Runnable {
-               run {
-                   Thread.sleep(300)
-                   btnRemote.background = ContextCompat.getDrawable(this,R.drawable.ic_settings_remote_blue)
-               }
+               Thread.sleep(3000)
+               btnRemote.background = ContextCompat.getDrawable(this,R.drawable.ic_settings_remote_blue)
+               btnRemote.isClickable = true
            }).start()
+            doAsync {
+                apiReposirtory.doRequest(PromoApi.setDataR2("ON"))
+            }
 
         }
+
+        //saat tombol lock diklik maka logo akan berubah dan text menjadi unlock
+
+        btnLock.setOnClickListener {
+            if(state){
+                btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_open_blue)
+                state = false
+            }
+            else if (!state){
+                btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_blue)
+                state = true
+            }
+
+        }
+
+        //saat tombol GPS ditekan akan diahlikan ke activity map
         btnGps.setOnClickListener {
             startActivity<MapsActivity>()
         }
 
-
-//        btnON.setOnClickListener {
-//            doAsync {
-//                apiReposirtory.doRequest(PromoApi.setData(btnON.text.toString()))
-//            }
-//
-//        }
-//        btnOFF.setOnClickListener {
-//            doAsync {
-//                apiReposirtory.doRequest(PromoApi.setData(btnOFF.text.toString()))
-//            }
-//
-//        }
-//        btnMap.setOnClickListener {
-//            startActivity<MapsActivity>()
-//        }
     }
 }
