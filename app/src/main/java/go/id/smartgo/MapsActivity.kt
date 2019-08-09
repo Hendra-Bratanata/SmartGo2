@@ -17,6 +17,10 @@ import go.id.smartgo.ApiRepository.ApiReposirtory
 import kotlinx.android.synthetic.main.activity_maps.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
+    override fun showData(listMap: List<Relay>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun showDataMap(listMap: List<MAPS>) {
         list.clear()
         mMap.clear()

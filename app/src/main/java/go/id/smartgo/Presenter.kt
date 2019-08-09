@@ -20,7 +20,7 @@ class Presenter(val view: MainView, val gson: Gson, val apiReposirtory: ApiRepos
     }
     fun getData(){
         doAsync {
-            val data = gson.fromJson(apiReposirtory.doRequest(PromoApi.getDataLokasi()),RelayResponse::class.java)
+            val data = gson.fromJson(apiReposirtory.doRequest(PromoApi.getData()),RelayResponse::class.java)
             uiThread {
                 view.showData(data.Data)
                 println(1,"tag","Dalam presenter"+data.Data)

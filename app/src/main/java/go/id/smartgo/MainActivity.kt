@@ -13,16 +13,25 @@ import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity(),MainView {
     override fun showData(listMap: List<Relay>) {
+        //isi varible R dengan object dari server
          val R = listMap[0]
+        //memastikan object R1 tidak kosong
+        if(!R.R1.isNullOrEmpty()){
+            //jika Object R1 sama dengan "OFF" bagroud berubah jadi lock
+            if(R.R1!!.equals("OFF")){
+                btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_blue)
+                tvLock.setText("Lock")
+                state = true
+            }
+            //jika Object R1 sama dengan "ON" bagroud berubah jadi unlock
+            else if(R.R1!!.equals("ON")){
+                btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_open_blue)
+                tvLock.setText("Unlock")
 
-        if(R.R1!!.equals("OFF")){
-            btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_blue)
-            state = true
+                state = false
+            }
         }
-        else if(R.R1!!.equals("ON")){
-            btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_open_blue)
-            state = false
-        }
+
 
 
     }
@@ -74,10 +83,18 @@ class MainActivity : AppCompatActivity(),MainView {
         btnLock.setOnClickListener {
             if(state){
                 btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_open_blue)
+                tvLock.setText("Unlock")
+                doAsync {
+                    apiReposirtory.doRequest(PromoApi.setDataR1("ON"))
+                }
                 state = false
             }
             else if (!state){
                 btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_blue)
+                tvLock.setText("Lock")
+                doAsync {
+                    apiReposirtory.doRequest(PromoApi.setDataR1("OFF"))
+                }
                 state = true
             }
 
