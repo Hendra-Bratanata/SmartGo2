@@ -29,4 +29,11 @@ object DataApi {
         Log.d("data", url)
         return url
     }
+
+    fun getAlatHash():String{
+        val url = BuildConfig.BASE_URL +"getDataHash.php"
+        Log.d("data", url)
+        return url
+    }
+
 }

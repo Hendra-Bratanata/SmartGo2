@@ -1,6 +1,8 @@
 package go.id.smartgo
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
@@ -10,27 +12,26 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 
-class MainActivity : AppCompatActivity(),MainView {
+class MainActivity : AppCompatActivity(), MainView {
     override fun showData(listMap: List<Relay>) {
         //isi varible R dengan object dari server
-         val R = listMap[0]
+        val R = listMap[0]
         //memastikan object R1 tidak kosong
-        if(!R.R1.isNullOrEmpty()){
+        if (!R.R1.isNullOrEmpty()) {
             //jika Object R1 sama dengan "OFF" bagroud berubah jadi lock
-            if(R.R1!!.equals("OFF")){
+            if (R.R1!!.equals("OFF")) {
                 btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_blue)
                 tvLock.setText("Lock")
                 state = true
             }
             //jika Object R1 sama dengan "ON" bagroud berubah jadi unlock
-            else if(R.R1!!.equals("ON")){
+            else if (R.R1!!.equals("ON")) {
                 btnLock.background = ContextCompat.getDrawable(this, go.id.smartgo.R.drawable.ic_lock_open_blue)
                 tvLock.setText("Unlock")
 
                 state = false
             }
         }
-
 
 
     }
@@ -43,19 +44,18 @@ class MainActivity : AppCompatActivity(),MainView {
     lateinit var gson: Gson
     lateinit var presenter: Presenter
     lateinit var listData: MutableList<Relay>
+    lateinit var pref : SharedPreference
     var state = true
-
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        pref = SharedPreference(this)
         apiReposirtory = ApiReposirtory()
         gson = Gson()
         listData = mutableListOf()
-        presenter = Presenter(this,gson,apiReposirtory)
+        presenter = Presenter(this, gson, apiReposirtory)
 
         presenter.getData()
 
@@ -64,13 +64,13 @@ class MainActivity : AppCompatActivity(),MainView {
         // data R2 pada database di set menjadi ON
         // dan remote tidak bisa diklik selama 3 detik
         btnRemote.setOnClickListener {
-            btnRemote.background = ContextCompat.getDrawable(this,R.drawable.ic_settings_remote_gray)
+            btnRemote.background = ContextCompat.getDrawable(this, R.drawable.ic_settings_remote_gray)
             btnRemote.isClickable = false
-           Thread(Runnable {
-               Thread.sleep(3000)
-               btnRemote.background = ContextCompat.getDrawable(this,R.drawable.ic_settings_remote_blue)
-               btnRemote.isClickable = true
-           }).start()
+            Thread(Runnable {
+                Thread.sleep(3000)
+                btnRemote.background = ContextCompat.getDrawable(this, R.drawable.ic_settings_remote_blue)
+                btnRemote.isClickable = true
+            }).start()
             doAsync {
                 apiReposirtory.doRequest(DataApi.setDataR2("ON"))
             }
@@ -80,16 +80,15 @@ class MainActivity : AppCompatActivity(),MainView {
         //saat tombol lock diklik maka logo akan berubah dan text menjadi unlock
 
         btnLock.setOnClickListener {
-            if(state){
-                btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_open_blue)
+            if (state) {
+                btnLock.background = ContextCompat.getDrawable(this, R.drawable.ic_lock_open_blue)
                 tvLock.setText("Unlock")
                 doAsync {
                     apiReposirtory.doRequest(DataApi.setDataR1("ON"))
                 }
                 state = false
-            }
-            else if (!state){
-                btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_blue)
+            } else if (!state) {
+                btnLock.background = ContextCompat.getDrawable(this, R.drawable.ic_lock_blue)
                 tvLock.setText("Lock")
                 doAsync {
                     apiReposirtory.doRequest(DataApi.setDataR1("OFF"))
@@ -109,4 +108,22 @@ class MainActivity : AppCompatActivity(),MainView {
         }
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.item_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item?.itemId
+        return if (id == R.id.logout) {
+            pref.clearSharedPreference()
+            startActivity<ScanActivity>()
+            finish()
+            true
+        }
+        else super.onOptionsItemSelected(item)
+    }
+
+
 }
