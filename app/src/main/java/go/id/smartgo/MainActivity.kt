@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import go.id.smartgo.ApiRepository.ApiReposirtory
-import go.id.smartgo.ApiRepository.PromoApi
+import go.id.smartgo.ApiRepository.DataApi
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.delay
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startActivity
 
@@ -73,7 +72,7 @@ class MainActivity : AppCompatActivity(),MainView {
                btnRemote.isClickable = true
            }).start()
             doAsync {
-                apiReposirtory.doRequest(PromoApi.setDataR2("ON"))
+                apiReposirtory.doRequest(DataApi.setDataR2("ON"))
             }
 
         }
@@ -85,7 +84,7 @@ class MainActivity : AppCompatActivity(),MainView {
                 btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_open_blue)
                 tvLock.setText("Unlock")
                 doAsync {
-                    apiReposirtory.doRequest(PromoApi.setDataR1("ON"))
+                    apiReposirtory.doRequest(DataApi.setDataR1("ON"))
                 }
                 state = false
             }
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity(),MainView {
                 btnLock.background = ContextCompat.getDrawable(this,R.drawable.ic_lock_blue)
                 tvLock.setText("Lock")
                 doAsync {
-                    apiReposirtory.doRequest(PromoApi.setDataR1("OFF"))
+                    apiReposirtory.doRequest(DataApi.setDataR1("OFF"))
                 }
                 state = true
             }
@@ -102,7 +101,11 @@ class MainActivity : AppCompatActivity(),MainView {
 
         //saat tombol GPS ditekan akan diahlikan ke activity map
         btnGps.setOnClickListener {
-            startActivity<MapsActivity>()
+            startActivity<MapsActivity>("main" to 1)
+        }
+
+        btnLog.setOnClickListener {
+            startActivity<LOG>()
         }
 
     }

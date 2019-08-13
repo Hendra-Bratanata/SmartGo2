@@ -2,6 +2,7 @@ package go.id.smartgo
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 
 data class MAPS(
@@ -15,4 +16,4 @@ data class MAPS(
     @SerializedName("waktu")
     var waktu: String? = null
 
-)
+):Serializable

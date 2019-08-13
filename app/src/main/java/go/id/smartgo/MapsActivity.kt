@@ -37,7 +37,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
 
 
                 markerOptions.position(latLang)
-                markerOptions.title(map.id)
+                markerOptions.title("Lokasi Log : ${map.id}")
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
                 if (i == listMap.size-1){
@@ -48,7 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
 
                 marker = mMap.addMarker(markerOptions)
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLang))
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLang,13F))
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLang,8F))
             }
 
         }
@@ -59,7 +59,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
             lang = maps.lang!!.toDouble()
             latLang = LatLng(lat,lang)
             markerOptions.position(latLang)
-            markerOptions.title("Lokasi Terakhir")
+            markerOptions.title("Lokasi Log : ${maps.id}")
             marker = mMap.addMarker(markerOptions)
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLang))
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLang,18F))
@@ -78,18 +78,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
     var lat = 0.0
     var lang = 0.0
     var riwayat = 0
+    lateinit var data : MAPS
 
     private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        val dataMain = intent.getIntExtra("main",0)
+
+
+
+
+
+
+
+
         apiReposirtory = ApiReposirtory()
         gson = Gson()
         list = mutableListOf()
         presenter = Presenter(this,gson,apiReposirtory)
 
-
+        if(dataMain == 2){
+            data = intent.extras.getSerializable("detail") as MAPS
+            if(!data.id.isNullOrEmpty()){
+                riwayat = 0
+                presenter.getMapsId(data.id.toString())
+            }
+        }
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -106,6 +122,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,MainView {
 
 
         }
+
+
     }
 
     /**
